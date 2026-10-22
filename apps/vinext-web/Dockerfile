@@ -2,6 +2,7 @@
 FROM node:24-alpine AS build
 WORKDIR /repo
 RUN corepack enable
+ARG API_PROXY_TARGET
 COPY . .
 RUN pnpm install --frozen-lockfile --filter vinext-web...
 RUN pnpm --filter vinext-web build

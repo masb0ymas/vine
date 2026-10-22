@@ -1,29 +1,58 @@
-import { Outlet, createRootRoute } from '@tanstack/react-router'
+import type { QueryClient } from '@tanstack/react-query'
 
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
+import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools'
+import { createRootRouteWithContext, Outlet } from '@tanstack/react-router'
+import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 
-import '../styles.css'
+import EmptyState from '@/components/block/common/empty-state'
+import { Toaster } from '@/components/ui/sonner'
+import DecorationProvider from '@/lib/providers/decoration'
 
-export const Route = createRootRoute({
-  component: RootComponent,
-})
+/**
+ * Root layout component that serves as the main wrapper for the application.
+ *
+ * Routing conventions:
+ * - Use brackets for route grouping: (group)
+ * - Prefix with `-` to ignore: -directory/ or -file.tsx
+ * - File-based routing supported: e.g. students.add.tsx creates /students/add
+ *
+ * @see https://tanstack.com/router/latest/docs/framework/react/routing/routing-concepts
+ */
+const RootLayout = () => (
+  <DecorationProvider>
+    {/* outlet = react children */}
+    <Outlet />
+    <Toaster position="bottom-right" richColors closeButton />
 
-function RootComponent() {
-  return (
-    <>
-      <Outlet />
+    {/* declare devtools panel */}
+    {import.meta.env.DEV && (
       <TanStackDevtools
         config={{
           position: 'bottom-right',
         }}
         plugins={[
           {
-            name: 'TanStack Router',
+            name: 'Tanstack Router',
             render: <TanStackRouterDevtoolsPanel />,
+          },
+          {
+            name: 'Tanstack Query',
+            render: <ReactQueryDevtoolsPanel />,
           },
         ]}
       />
-    </>
-  )
+    )}
+  </DecorationProvider>
+)
+
+export interface RouterContext {
+  queryClient: QueryClient
 }
+
+export const Route = createRootRouteWithContext<RouterContext>()({
+  component: RootLayout,
+  notFoundComponent: () => (
+    <EmptyState title="Page not found" description="That route does not exist." />
+  ),
+})
