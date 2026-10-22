@@ -1,6 +1,8 @@
 'use client'
 
+import { TanStackDevtools } from '@tanstack/react-devtools'
 import { environmentManager, QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools'
 
 function makeQueryClient() {
   return new QueryClient({
@@ -24,5 +26,24 @@ export function getQueryClient() {
 }
 
 export default function ReactQueryProvider({ children }: { children: React.ReactNode }) {
-  return <QueryClientProvider client={getQueryClient()}>{children}</QueryClientProvider>
+  return (
+    <QueryClientProvider client={getQueryClient()}>
+      {children}
+
+      {/* declare devtools panel */}
+      {process.env.NODE_ENV === 'development' && (
+        <TanStackDevtools
+          config={{
+            position: 'bottom-right',
+          }}
+          plugins={[
+            {
+              name: 'Tanstack Query',
+              render: <ReactQueryDevtoolsPanel />,
+            },
+          ]}
+        />
+      )}
+    </QueryClientProvider>
+  )
 }
