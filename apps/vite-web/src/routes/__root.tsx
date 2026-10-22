@@ -2,10 +2,16 @@ import type { QueryClient } from '@tanstack/react-query'
 
 import { TanStackDevtools } from '@tanstack/react-devtools'
 import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools'
-import { createRootRouteWithContext, Outlet } from '@tanstack/react-router'
+import {
+  createRootRouteWithContext,
+  Outlet,
+  useRouter,
+  type ErrorComponentProps,
+} from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 
-import EmptyState from '@/components/block/common/empty-state'
+import ErrorPage from '@/components/block/common/error-page'
+import NotFoundPage from '@/components/block/common/not-found-page'
 import { Toaster } from '@/components/ui/sonner'
 import DecorationProvider from '@/lib/providers/decoration'
 
@@ -52,7 +58,12 @@ export interface RouterContext {
 
 export const Route = createRootRouteWithContext<RouterContext>()({
   component: RootLayout,
-  notFoundComponent: () => (
-    <EmptyState title="Page not found" description="That route does not exist." />
-  ),
+  notFoundComponent: NotFoundPage,
+  errorComponent: RootError,
 })
+
+function RootError({ error }: ErrorComponentProps) {
+  const router = useRouter()
+  // invalidate() re-runs the loaders and resets the error boundary.
+  return <ErrorPage error={error} onRetry={() => void router.invalidate()} />
+}

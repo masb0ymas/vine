@@ -1,5 +1,5 @@
-import EmptyState from '@/components/block/common/empty-state'
+import NotFoundPage from '@/components/block/common/not-found-page'
 
 export default function NotFound() {
-  return <EmptyState title="Page not found" description="That route does not exist." />
+  return <NotFoundPage />
 }
